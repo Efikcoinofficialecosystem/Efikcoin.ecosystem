@@ -1,0 +1,57 @@
+efikcoin-ecosystem/
+├── public/                 # Static assets
+├── src/
+│   ├── app/                # Next.js App Router
+│   │   ├── layout.tsx      # Root layout with Web3 provider
+│   │   ├── page.tsx        # Homepage / Dashboard
+│   │   ├── dashboard/      # Dashboard pages
+│   │   ├── stake/          # Staking interface
+│   │   ├── swap/           # Token swap (DEX)
+│   │   ├── holders/        # Global holder map
+│   │   ├── governance/     # DAO / voting
+│   │   └── admin/          # Admin dashboard (protected)
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── Sidebar.tsx # Navigation with EFIK branding [citation:1]
+│   │   │   ├── Header.tsx  # Wallet connect, theme toggle
+│   │   │   └── Footer.tsx
+│   │   ├── wallet/
+│   │   │   ├── ConnectButton.tsx  # Custom wallet connect [citation:3]
+│   │   │   ├── AccountDisplay.tsx # Address, balance, ENS [citation:9]
+│   │   │   └── ChainSwitcher.tsx  # Network selector [citation:6]
+│   │   ├── token/
+│   │   │   ├── TokenBalance.tsx   # EFIK balance display
+│   │   │   ├── TokenIcon.tsx      # EFIK logo with fallback [citation:6]
+│   │   │   └── TokenSelector.tsx  # For swap interface
+│   │   ├── charts/
+│   │   │   ├── PriceChart.tsx     # Live EFIK price chart [citation:1]
+│   │   │   ├── HolderMap.tsx      # World map of holders [citation:1]
+│   │   │   └── StakingChart.tsx   # Staking rewards visualization
+│   │   ├── governance/
+│   │   │   ├── ProposalList.tsx
+│   │   │   └── VoteCard.tsx
+│   │   └── ui/             # Reusable UI components
+│   │       ├── Button.tsx
+│   │       ├── Card.tsx
+│   │       └── Modal.tsx
+│   ├── lib/
+│   │   ├── web3/
+│   │   │   ├── config.ts        # Wagmi configuration [citation:6]
+│   │   │   ├── contracts.ts     # Contract ABIs and addresses
+│   │   │   └── hooks/           # Custom Web3 hooks
+│   │   │       ├── useEFIK.ts   # EFIK token interactions
+│   │   │       ├── useStaking.ts # Staking functions
+│   │   │       └── useGasStation.ts # Gas credit system
+│   │   ├── utils/
+│   │   │   ├── formatters.ts    # Number/currency formatting [citation:1]
+│   │   │   └── api.ts           # External API calls (CoinGecko, etc.)
+│   │   └── constants/
+│   │       └── index.ts         # Contract addresses, ABIs
+│   ├── styles/
+│   │   └── globals.css          # Tailwind imports
+│   └── types/
+│       └── index.ts             # TypeScript definitions
+├── .env.local                   # Environment variables
+├── tailwind.config.js
+├── next.config.js
+└── package.json
