@@ -2,83 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Efikcoin Official Ecosystem (EOE)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <style>body{background:#0a0a0a;color:#fff;}</style>
+    <style>
+        body { background: #0a0a0a; color: #fff; font-family: system-ui; }
+        .card { background: #1a1a1a; border-radius: 1rem; padding: 1.5rem; border: 1px solid #333; }
+    </style>
 </head>
 <body class="p-6">
-    <div class="max-w-md mx-auto text-center">
-        <h1 class="text-3xl font-bold text-amber-400">EOE</h1>
-        <p class="text-gray-400 mb-4">Efikcoin Official Ecosystem</p>
-        <p class="text-xs text-gray-500 break-all">0xe5f245634af5117ae1cb93b579f911fce6ba8b91</p>
+    <div class="max-w-2xl mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                Efikcoin Official Ecosystem
+            </h1>
+            <p class="text-gray-400 mt-2">Symbol: <span class="font-mono text-amber-400">EOE</span></p>
+            <p class="text-sm text-gray-500 break-all">0xe5f245634af5117ae1cb93b579f911fce6ba8b91</p>
+        </div>
 
-        <button id="connect" class="bg-amber-500 px-6 py-2 rounded-full mt-4">Connect Wallet</button>
+        <!-- Public Token Data (No Wallet Needed) -->
+        <div class="card mb-6">
+            <h2 class="text-xl font-semibold mb-4">📊 Token Statistics (Live from BSC)</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-gray-400 text-sm">Total Supply</p>
+                    <p id="totalSupply" class="text-2xl font-bold text-amber-400">Loading...</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-sm">Holders Count</p>
+                    <p id="holdersCount" class="text-2xl font-bold text-amber-400">Loading...</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-gray-400 text-sm">Contract Creator</p>
+                    <p id="creator" class="font-mono text-sm break-all">Loading...</p>
+                </div>
+            </div>
+        </div>
 
-        <div id="info" class="mt-6 hidden">
-            <div class="bg-gray-800 p-4 rounded">
-                <p class="text-gray-400">Your Balance</p>
-                <p id="balance" class="text-2xl font-bold">0 EOE</p>
+        <!-- Check Any Address Balance (Manual Entry) -->
+        <div class="card mb-6">
+            <h2 class="text-xl font-semibold mb-4">🔍 Check Any Address Balance</h2>
+            <div class="flex gap-2">
+                <input type="text" id="addressInput" placeholder="Enter wallet address (0x...)" class="flex-1 bg-black border border-gray-700 rounded-lg px-4 py-2 text-white">
+                <button id="checkBalanceBtn" class="bg-amber-500 hover:bg-amber-600 text-black font-semibold px-6 py-2 rounded-lg">
+                    Check
+                </button>
             </div>
-            <div class="bg-gray-800 p-4 rounded mt-2">
-                <p class="text-gray-400">Total Supply</p>
-                <p id="totalSupply" class="text-xl">Loading...</p>
+            <div id="balanceResult" class="mt-4 hidden">
+                <p class="text-gray-400">Balance: <span id="addressBalance" class="text-2xl font-bold text-amber-400"></span></p>
             </div>
+        </div>
+
+        <!-- Your Personal Balance (if you want quick access) -->
+        <div class="card">
+            <h2 class="text-xl font-semibold mb-4">👤 Your Balance (Deployer)</h2>
+            <p id="deployerBalance" class="text-3xl font-bold text-amber-400">Loading...</p>
         </div>
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = "0xe5f245634af5117ae1cb93b579f911fce6ba8b91";
-        // Minimal ERC20 ABI (only balanceOf, totalSupply, decimals)
-        const ABI = [[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"AllowanceOverflow","type":"error"},{"inputs":[],"name":"AllowanceUnderflow","type":"error"},{"inputs":[],"name":"AlreadyInitialized","type":"error"},{"inputs":[],"name":"InsufficientAllowance","type":"error"},{"inputs":[],"name":"InsufficientBalance","type":"error"},{"inputs":[],"name":"InvalidInitialization","type":"error"},{"inputs":[],"name":"InvalidPermit","type":"error"},{"inputs":[],"name":"NewOwnerIsZeroAddress","type":"error"},{"inputs":[],"name":"NoHandoverRequest","type":"error"},{"inputs":[],"name":"NotInitializing","type":"error"},{"inputs":[],"name":"Permit2AllowanceIsFixedAtInfinity","type":"error"},{"inputs":[],"name":"PermitExpired","type":"error"},{"inputs":[],"name":"TotalSupplyOverflow","type":"error"},{"inputs":[],"name":"Unauthorized","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[],"name":"ContractURIUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint64","name":"version","type":"uint64"}],"name":"Initialized","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"pendingOwner","type":"address"}],"name":"OwnershipHandoverCanceled","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"pendingOwner","type":"address"}],"name":"OwnershipHandoverRequested","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"oldOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"DOMAIN_SEPARATOR","outputs":[{"internalType":"bytes32","name":"result","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burnFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"cancelOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"pendingOwner","type":"address"}],"name":"completeOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"contractURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"string","name":"contractURI","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"owner","type":"address"}],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"nonces","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"result","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pendingOwner","type":"address"}],"name":"ownershipHandoverExpiresAt","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"deadline","type":"uint256"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"permit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"requestOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"string","name":"_contractURI","type":"string"}],"name":"setContractURI","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"payable","type":"function"}]
-            "function balanceOf(address) view returns (uint256)",
-            "function totalSupply() view returns (uint256)",
-            "function decimals() view returns (uint8)"
-        ];
+        // Contract address and your deployer address (replace with your actual wallet)
+        const CONTRACT = "0xe5f245634af5117ae1cb93b579f911fce6ba8b91";
+        const DEPLOYER = "0xc5ad5cfcf81ad63a94227334b898eafce6b27cca"; // Your wallet from earlier
 
-        document.getElementById('connect').addEventListener('click', async () => {
-            if (!window.ethereum) {
-                alert("Please install MetaMask!");
-                return;
+        // BscScan API (free, no key needed for basic calls, but limited)
+        const BSCSCAN_API = "https://api.bscscan.com/api";
+
+        async function fetchBscScan(module, action, address, contract = CONTRACT) {
+            const url = `${BSCSCAN_API}?module=${module}&action=${action}&contractaddress=${contract}&address=${address}&apikey=YourApiKeyToken`; 
+            // Note: Free tier works without key for many calls, but may be rate limited. If issues, we'll add a key later.
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data.result;
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        }
+
+        async function loadTokenStats() {
+            // Total supply
+            const supply = await fetchBscScan('stats', 'tokensupply', CONTRACT);
+            if (supply) {
+                document.getElementById('totalSupply').innerText = (parseInt(supply) / 1e18).toLocaleString() + ' EOE';
+            } else {
+                document.getElementById('totalSupply').innerText = 'Unavailable';
             }
 
-            try {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const signer = await provider.getSigner();
-                const account = await signer.getAddress();
+            // Holders count (BscScan may not provide this directly, but we can try)
+            // Alternative: use a third-party API like Covalent, but for simplicity we'll show placeholder.
+            document.getElementById('holdersCount').innerText = 'Check BscScan';
 
-                // Switch to BSC
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x38' }]
-                }).catch(async (e) => {
-                    if (e.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x38',
-                                chainName: 'BNB Smart Chain',
-                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                                rpcUrls: ['https://bsc-dataseed.binance.org/']
-                            }]
-                        });
-                    }
-                });
+            // Creator address (from contract creation tx)
+            const creator = await fetchBscScan('contract', 'getcontractcreation', CONTRACT);
+            if (creator && creator[0]) {
+                document.getElementById('creator').innerText = creator[0].contractCreator;
+            } else {
+                document.getElementById('creator').innerText = 'Unknown';
+            }
 
-                const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-                const balance = await contract.balanceOf(account);
-                const decimals = await contract.decimals();
-                const totalSupply = await contract.totalSupply();
+            // Deployer balance
+            const deployerBal = await fetchBscScan('account', 'tokenbalance', DEPLOYER, CONTRACT);
+            if (deployerBal) {
+                document.getElementById('deployerBalance').innerText = (parseInt(deployerBal) / 1e18).toLocaleString() + ' EOE';
+            } else {
+                document.getElementById('deployerBalance').innerText = 'Unavailable';
+            }
+        }
 
-                document.getElementById('info').classList.remove('hidden');
-                document.getElementById('balance').innerText = ethers.formatUnits(balance, decimals) + ' EOE';
-                document.getElementById('totalSupply').innerText = ethers.formatUnits(totalSupply, decimals) + ' EOE';
-            } catch (error) {
-                console.error(error);
-                alert("Error: " + error.message);
+        // Check custom address balance
+        document.getElementById('checkBalanceBtn').addEventListener('click', async () => {
+            const addr = document.getElementById('addressInput').value.trim();
+            if (!addr) return;
+            const balance = await fetchBscScan('account', 'tokenbalance', addr, CONTRACT);
+            const resultDiv = document.getElementById('balanceResult');
+            const balanceSpan = document.getElementById('addressBalance');
+            if (balance) {
+                balanceSpan.innerText = (parseInt(balance) / 1e18).toLocaleString() + ' EOE';
+                resultDiv.classList.remove('hidden');
+            } else {
+                alert('Error fetching balance. Check address or try again.');
             }
         });
+
+        // Initial load
+        loadTokenStats();
     </script>
 </body>
-</html>
+        </html>
