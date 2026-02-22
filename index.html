@@ -2,241 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Efikcoin Official Ecosystem (EOE)</title>
-    <!-- Tailwind CSS for styling (no build) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ethers.js for blockchain interaction -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <style>
-        body { background: #0a0a0a; color: #fff; }
-        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,215,0,0.2); }
-    </style>
+    <style>body{background:#0a0a0a;color:#fff;}</style>
 </head>
 <body class="p-6">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                Efikcoin Official Ecosystem
-            </h1>
-            <p class="text-gray-400 mt-2">Symbol: <span class="font-mono text-amber-400">EOE</span></p>
-            <p class="text-sm text-gray-500">Contract: 0xe5f245634af5117ae1cb93b579f911fce6ba8b91</p>
-        </div>
+    <div class="max-w-md mx-auto text-center">
+        <h1 class="text-3xl font-bold text-amber-400">EOE</h1>
+        <p class="text-gray-400 mb-4">Efikcoin Official Ecosystem</p>
+        <p class="text-xs text-gray-500 break-all">0xe5f245634af5117ae1cb93b579f911fce6ba8b91</p>
 
-        <!-- Connect Wallet -->
-        <div class="flex justify-center mb-6">
-            <button id="connectBtn" class="bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 px-8 rounded-full transition">
-                Connect Wallet
-            </button>
-        </div>
+        <button id="connect" class="bg-amber-500 px-6 py-2 rounded-full mt-4">Connect Wallet</button>
 
-        <!-- Wallet Info -->
-        <div id="walletInfo" class="glass-card rounded-2xl p-6 mb-6 hidden">
-            <div class="grid md:grid-cols-2 gap-4">
-                <div>
-                    <p class="text-gray-400 text-sm">Connected Address</p>
-                    <p id="address" class="font-mono break-all"></p>
-                </div>
-                <div>
-                    <p class="text-gray-400 text-sm">EOE Balance</p>
-                    <p id="balance" class="text-2xl font-bold text-amber-400">0</p>
-                </div>
+        <div id="info" class="mt-6 hidden">
+            <div class="bg-gray-800 p-4 rounded">
+                <p class="text-gray-400">Your Balance</p>
+                <p id="balance" class="text-2xl font-bold">0 EOE</p>
             </div>
-        </div>
-
-        <!-- Token Stats -->
-        <div class="grid md:grid-cols-3 gap-4 mb-6">
-            <div class="glass-card rounded-xl p-4 text-center">
-                <p class="text-gray-400 text-sm">Total Supply</p>
-                <p id="totalSupply" class="text-xl font-bold">Loading...</p>
+            <div class="bg-gray-800 p-4 rounded mt-2">
+                <p class="text-gray-400">Total Supply</p>
+                <p id="totalSupply" class="text-xl">Loading...</p>
             </div>
-            <div class="glass-card rounded-xl p-4 text-center">
-                <p class="text-gray-400 text-sm">Holders Count</p>
-                <p id="holdersCount" class="text-xl font-bold">Loading...</p>
-            </div>
-            <div class="glass-card rounded-xl p-4 text-center">
-                <p class="text-gray-400 text-sm">Your Verified?</p>
-                <p id="verifiedStatus" class="text-xl font-bold">-</p>
-            </div>
-        </div>
-
-        <!-- Holders List -->
-        <div class="glass-card rounded-2xl p-6">
-            <h2 class="text-xl font-semibold mb-4">🌍 Global Holders</h2>
-            <div id="holdersList" class="max-h-60 overflow-y-auto space-y-2">
-                <p class="text-gray-500">Connect wallet to load holders...</p>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="text-center text-gray-500 text-sm mt-8">
-            Built for humanity. Live on BSC.
         </div>
     </div>
 
     <script>
-        // Contract address and minimal ABI (only the functions we need)
         const CONTRACT_ADDRESS = "0xe5f245634af5117ae1cb93b579f911fce6ba8b91";
-        const ABI = [
-            "function name() view returns (string)",
-            "function symbol() view returns (string)",
-            "function decimals() view returns (uint8)",
-            "function totalSupply() view returns (uint256)",
+        // Minimal ERC20 ABI (only balanceOf, totalSupply, decimals)
+        const ABI = [[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"AllowanceOverflow","type":"error"},{"inputs":[],"name":"AllowanceUnderflow","type":"error"},{"inputs":[],"name":"AlreadyInitialized","type":"error"},{"inputs":[],"name":"InsufficientAllowance","type":"error"},{"inputs":[],"name":"InsufficientBalance","type":"error"},{"inputs":[],"name":"InvalidInitialization","type":"error"},{"inputs":[],"name":"InvalidPermit","type":"error"},{"inputs":[],"name":"NewOwnerIsZeroAddress","type":"error"},{"inputs":[],"name":"NoHandoverRequest","type":"error"},{"inputs":[],"name":"NotInitializing","type":"error"},{"inputs":[],"name":"Permit2AllowanceIsFixedAtInfinity","type":"error"},{"inputs":[],"name":"PermitExpired","type":"error"},{"inputs":[],"name":"TotalSupplyOverflow","type":"error"},{"inputs":[],"name":"Unauthorized","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[],"name":"ContractURIUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint64","name":"version","type":"uint64"}],"name":"Initialized","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"pendingOwner","type":"address"}],"name":"OwnershipHandoverCanceled","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"pendingOwner","type":"address"}],"name":"OwnershipHandoverRequested","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"oldOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"DOMAIN_SEPARATOR","outputs":[{"internalType":"bytes32","name":"result","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burnFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"cancelOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"pendingOwner","type":"address"}],"name":"completeOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"contractURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"string","name":"contractURI","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"address","name":"owner","type":"address"}],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"nonces","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"result","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"pendingOwner","type":"address"}],"name":"ownershipHandoverExpiresAt","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"deadline","type":"uint256"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"permit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"requestOwnershipHandover","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"string","name":"_contractURI","type":"string"}],"name":"setContractURI","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"result","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"payable","type":"function"}]
             "function balanceOf(address) view returns (uint256)",
-            "function getAllHolders() view returns (address[])",
-            "function getHolderCount() view returns (uint256)",
-            "function verifiedOwners(address) view returns (bool)"
+            "function totalSupply() view returns (uint256)",
+            "function decimals() view returns (uint8)"
         ];
 
-        let provider, signer, contract;
-        let currentAccount = null;
-
-        // Connect wallet
-        document.getElementById('connectBtn').addEventListener('click', async () => {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    // Request account access
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    provider = new ethers.BrowserProvider(window.ethereum);
-                    signer = await provider.getSigner();
-                    currentAccount = await signer.getAddress();
-                    
-                    // Switch to BSC Mainnet
-                    await switchToBSC();
-                    
-                    // Initialize contract
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-                    
-                    // Update UI
-                    document.getElementById('walletInfo').classList.remove('hidden');
-                    document.getElementById('address').innerText = currentAccount;
-                    
-                    // Load data
-                    await loadBalances();
-                    await loadTokenStats();
-                    await loadHolders();
-                    
-                } catch (error) {
-                    console.error(error);
-                    alert('Connection failed: ' + error.message);
-                }
-            } else {
-                alert('Please install MetaMask or another Web3 wallet.');
+        document.getElementById('connect').addEventListener('click', async () => {
+            if (!window.ethereum) {
+                alert("Please install MetaMask!");
+                return;
             }
-        });
 
-        // Switch to BSC Mainnet
-        async function switchToBSC() {
             try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const account = await signer.getAddress();
+
+                // Switch to BSC
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x38' }], // BSC Mainnet chainId
+                    params: [{ chainId: '0x38' }]
+                }).catch(async (e) => {
+                    if (e.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x38',
+                                chainName: 'BNB Smart Chain',
+                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                rpcUrls: ['https://bsc-dataseed.binance.org/']
+                            }]
+                        });
+                    }
                 });
+
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+                const balance = await contract.balanceOf(account);
+                const decimals = await contract.decimals();
+                const totalSupply = await contract.totalSupply();
+
+                document.getElementById('info').classList.remove('hidden');
+                document.getElementById('balance').innerText = ethers.formatUnits(balance, decimals) + ' EOE';
+                document.getElementById('totalSupply').innerText = ethers.formatUnits(totalSupply, decimals) + ' EOE';
             } catch (error) {
-                // This error code indicates that the chain has not been added to MetaMask
-                if (error.code === 4902) {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: '0x38',
-                            chainName: 'BNB Smart Chain',
-                            nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                            rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                            blockExplorerUrls: ['https://bscscan.com/']
-                        }]
-                    });
-                } else {
-                    throw error;
-                }
+                console.error(error);
+                alert("Error: " + error.message);
             }
-        }
-
-        async function loadBalances() {
-            if (!contract || !currentAccount) return;
-            const balance = await contract.balanceOf(currentAccount);
-            const decimals = await contract.decimals();
-            document.getElementById('balance').innerText = ethers.formatUnits(balance, decimals);
-            
-            // Check if verified
-            try {
-                const verified = await contract.verifiedOwners(currentAccount);
-                document.getElementById('verifiedStatus').innerText = verified ? '✅' : '❌';
-            } catch {
-                document.getElementById('verifiedStatus').innerText = 'N/A';
-            }
-        }
-
-        async function loadTokenStats() {
-            if (!contract) return;
-            const totalSupply = await contract.totalSupply();
-            const decimals = await contract.decimals();
-            document.getElementById('totalSupply').innerText = ethers.formatUnits(totalSupply, decimals) + ' EOE';
-            
-            // Try to get holder count
-            try {
-                const count = await contract.getHolderCount();
-                document.getElementById('holdersCount').innerText = count.toString();
-            } catch {
-                document.getElementById('holdersCount').innerText = 'N/A';
-            }
-        }
-
-        async function loadHolders() {
-            if (!contract) return;
-            try {
-                const holders = await contract.getAllHolders();
-                const listDiv = document.getElementById('holdersList');
-                listDiv.innerHTML = '';
-                
-                if (holders.length === 0) {
-                    listDiv.innerHTML = '<p class="text-gray-500">No holders found</p>';
-                    return;
-                }
-                
-                // Display first 20 holders
-                const displayHolders = holders.slice(0, 20);
-                for (const addr of displayHolders) {
-                    const balance = await contract.balanceOf(addr);
-                    const decimals = await contract.decimals();
-                    const balFormatted = ethers.formatUnits(balance, decimals);
-                    
-                    const item = document.createElement('div');
-                    item.className = 'flex justify-between items-center p-2 bg-black/30 rounded';
-                    item.innerHTML = `
-                        <span class="font-mono text-sm">${addr.slice(0,6)}...${addr.slice(-4)}</span>
-                        <span class="text-amber-400">${Number(balFormatted).toFixed(2)} EOE</span>
-                    `;
-                    listDiv.appendChild(item);
-                }
-                
-                if (holders.length > 20) {
-                    const more = document.createElement('p');
-                    more.className = 'text-gray-500 text-sm mt-2';
-                    more.innerText = `... and ${holders.length - 20} more`;
-                    listDiv.appendChild(more);
-                }
-            } catch (error) {
-                console.error('Failed to load holders:', error);
-                document.getElementById('holdersList').innerHTML = '<p class="text-gray-500">Holders list not available</p>';
-            }
-        }
-
-        // Auto-refresh data when account changes
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length > 0) {
-                    currentAccount = accounts[0];
-                    loadBalances();
-                } else {
-                    window.location.reload();
-                }
-            });
-            
-            window.ethereum.on('chainChanged', () => {
-                window.location.reload();
-            });
-        }
+        });
     </script>
 </body>
 </html>
