@@ -2,175 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Efikcoin Official Ecosystem (EOE) – Live on BSC</title>
+    <title>Efikcoin Official Ecosystem (EOE)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <style>
-        body { background: #0a0a0a; color: #fff; }
-        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); border: 1px solid rgba(255,215,0,0.2); }
-        .input-field { background: #1a1a1a; border: 1px solid #333; color: white; }
-    </style>
+    <style>body{background:#0a0a0a;color:#fff;}</style>
 </head>
 <body class="p-6">
-    <div class="max-w-3xl mx-auto">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                Efikcoin Official Ecosystem
-            </h1>
-            <p class="text-gray-400 mt-2">Symbol: <span class="font-mono text-amber-400">EOE</span></p>
-            <p class="text-sm text-gray-500 break-all">0xe5f245634af5117ae1cb93b579f911fce6ba8b91</p>
-        </div>
+    <div class="max-w-md mx-auto text-center">
+        <h1 class="text-3xl font-bold text-amber-400">EOE</h1>
+        <p class="text-gray-400 mb-4">Efikcoin Official Ecosystem</p>
+        <p class="text-xs text-gray-500 break-all">0xe5f245634af5117ae1cb93b579f911fce6ba8b91</p>
 
-        <!-- Live Stats (No Wallet Needed) -->
-        <div class="glass rounded-2xl p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">📈 Live Token Stats (from BSC Blockchain)</h2>
-            <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-black/40 p-4 rounded-xl">
-                    <p class="text-gray-400 text-sm">Total Supply</p>
-                    <p id="totalSupply" class="text-2xl font-bold text-amber-400">Loading...</p>
-                </div>
-                <div class="bg-black/40 p-4 rounded-xl">
-                    <p class="text-gray-400 text-sm">Deployer Balance</p>
-                    <p id="deployerBalance" class="text-2xl font-bold text-amber-400">Loading...</p>
-                </div>
+        <button id="connect" class="bg-amber-500 px-6 py-2 rounded-full mt-4">Connect Wallet</button>
+
+        <div id="info" class="mt-6 hidden">
+            <div class="bg-gray-800 p-4 rounded">
+                <p class="text-gray-400">Your Balance</p>
+                <p id="balance" class="text-2xl font-bold">0 EOE</p>
+            </div>
+            <div class="bg-gray-800 p-4 rounded mt-2">
+                <p class="text-gray-400">Total Supply</p>
+                <p id="totalSupply" class="text-xl">Loading...</p>
             </div>
         </div>
 
-        <!-- Check Any Address Balance -->
-        <div class="glass rounded-2xl p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">🔍 Check Any Wallet Balance</h2>
-            <div class="flex flex-col md:flex-row gap-3">
-                <input type="text" id="addressInput" placeholder="Enter BSC address (0x...)" 
-                       class="flex-1 input-field rounded-lg px-4 py-3">
-                <button id="checkBtn" class="bg-amber-500 hover:bg-amber-600 text-black font-semibold px-8 py-3 rounded-lg transition">
-                    Check Balance
-                </button>
-            </div>
-            <div id="balanceResult" class="mt-4 hidden">
-                <div class="bg-black/40 p-4 rounded-xl">
-                    <p class="text-gray-400 text-sm">EOE Balance</p>
-                    <p id="checkedBalance" class="text-3xl font-bold text-amber-400">0</p>
-                </div>
-            </div>
-            <div id="errorMsg" class="mt-4 text-red-400 hidden"></div>
-        </div>
-
-        <!-- How to Get EOE -->
-        <div class="glass rounded-2xl p-6 text-center">
-            <h2 class="text-xl font-semibold mb-2">🚀 Get EOE Tokens</h2>
-            <p class="text-gray-300 mb-4">To receive EOE, send BNB to the contract address or contact the ecosystem founder.</p>
-            <p class="text-sm text-gray-500">Contract: 0xe5f245634af5117ae1cb93b579f911fce6ba8b91</p>
-        </div>
-
-        <div class="text-center text-gray-500 text-sm mt-8">
-            Built for humanity. Live on BSC Mainnet.
-        </div>
+        <!-- Error display area -->
+        <div id="errorMsg" class="mt-4 p-3 bg-red-900/50 text-red-300 rounded hidden"></div>
     </div>
 
     <script>
-        // Contract details
         const CONTRACT_ADDRESS = "0xe5f245634af5117ae1cb93b579f911fce6ba8b91";
-        const DEPLOYER_ADDRESS = "0xc5ad5cfcf81ad63a94227334b898eafce6b27cca"; // Your wallet
-
-        // Minimal ABI (only needed functions)
         const ABI = [
-            "function name() view returns (string)",
-            "function symbol() view returns (string)",
-            "function decimals() view returns (uint8)",
+            "function balanceOf(address) view returns (uint256)",
             "function totalSupply() view returns (uint256)",
-            "function balanceOf(address) view returns (uint256)"
+            "function decimals() view returns (uint8)"
         ];
 
-        // Public BSC RPC endpoint (no API key required)
-        const BSC_RPC = "https://bsc-dataseed.binance.org/";
-
-        // Initialize provider and contract
-        const provider = new ethers.JsonRpcProvider(BSC_RPC);
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-
-        // DOM elements
-        const totalSupplyEl = document.getElementById('totalSupply');
-        const deployerBalanceEl = document.getElementById('deployerBalance');
-        const addressInput = document.getElementById('addressInput');
-        const checkBtn = document.getElementById('checkBtn');
-        const balanceResult = document.getElementById('balanceResult');
-        const checkedBalanceEl = document.getElementById('checkedBalance');
-        const errorMsg = document.getElementById('errorMsg');
-
-        // Helper to format token amount
-        async function formatAmount(amount) {
-            const decimals = await contract.decimals();
-            return ethers.formatUnits(amount, decimals);
-        }
-
-        // Load initial data
-        async function loadTokenData() {
-            try {
-                const [totalSupply, deployerBal, decimals] = await Promise.all([
-                    contract.totalSupply(),
-                    contract.balanceOf(DEPLOYER_ADDRESS),
-                    contract.decimals()
-                ]);
-
-                totalSupplyEl.innerText = Number(ethers.formatUnits(totalSupply, decimals)).toLocaleString() + ' EOE';
-                deployerBalanceEl.innerText = Number(ethers.formatUnits(deployerBal, decimals)).toLocaleString() + ' EOE';
-            } catch (err) {
-                console.error(err);
-                totalSupplyEl.innerText = 'Error loading';
-                deployerBalanceEl.innerText = 'Error loading';
-                showError('Failed to load blockchain data. Please refresh.');
-            }
-        }
-
-        // Check balance for entered address
-        async function checkBalance(address) {
-            try {
-                const [balance, decimals] = await Promise.all([
-                    contract.balanceOf(address),
-                    contract.decimals()
-                ]);
-                const formatted = ethers.formatUnits(balance, decimals);
-                checkedBalanceEl.innerText = Number(formatted).toLocaleString() + ' EOE';
-                balanceResult.classList.remove('hidden');
-                errorMsg.classList.add('hidden');
-            } catch (err) {
-                console.error(err);
-                showError('Invalid address or network error.');
-                balanceResult.classList.add('hidden');
-            }
-        }
+        const connectBtn = document.getElementById('connect');
+        const infoDiv = document.getElementById('info');
+        const balanceSpan = document.getElementById('balance');
+        const totalSupplySpan = document.getElementById('totalSupply');
+        const errorDiv = document.getElementById('errorMsg');
 
         function showError(msg) {
-            errorMsg.innerText = msg;
-            errorMsg.classList.remove('hidden');
+            errorDiv.innerText = msg;
+            errorDiv.classList.remove('hidden');
+            console.error(msg);
         }
 
-        // Event listeners
-        checkBtn.addEventListener('click', () => {
-            const addr = addressInput.value.trim();
-            if (!addr) {
-                showError('Please enter an address.');
+        connectBtn.addEventListener('click', async () => {
+            errorDiv.classList.add('hidden'); // clear old errors
+
+            if (!window.ethereum) {
+                showError("MetaMask not detected. Please install MetaMask.");
                 return;
             }
-            // Basic validation: must start with 0x and be 42 chars
-            if (!addr.match(/^0x[a-fA-F0-9]{40}$/)) {
-                showError('Invalid BSC address format.');
-                return;
-            }
-            checkBalance(addr);
-        });
 
-        // Allow Enter key in input
-        addressInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                checkBtn.click();
+            try {
+                // Request accounts
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length === 0) {
+                    showError("No accounts returned. Please unlock MetaMask.");
+                    return;
+                }
+
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const account = await signer.getAddress();
+
+                // Switch to BSC
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }]
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        // Add BSC network
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x38',
+                                chainName: 'BNB Smart Chain',
+                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                blockExplorerUrls: ['https://bscscan.com/']
+                            }]
+                        });
+                    } else {
+                        throw switchError;
+                    }
+                }
+
+                // Now create contract instance
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+
+                // Fetch data
+                const balance = await contract.balanceOf(account);
+                const decimals = await contract.decimals();
+                const totalSupply = await contract.totalSupply();
+
+                // Format and display
+                balanceSpan.innerText = ethers.formatUnits(balance, decimals) + ' EOE';
+                totalSupplySpan.innerText = ethers.formatUnits(totalSupply, decimals) + ' EOE';
+                infoDiv.classList.remove('hidden');
+            } catch (error) {
+                showError(error.message || "An unknown error occurred.");
             }
         });
-
-        // Start
-        loadTokenData();
     </script>
 </body>
 </html>
