@@ -3,144 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EfikCoin Eternal (ECE) – Web3 Interface</title>
+    <title>EfikCoin Eternal (ECE) – Live Web3 Interface</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ethers.js v6 for blockchain interaction -->
+    <!-- Ethers.js for blockchain interaction -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; }
-        .glass-card { background: rgba(30,30,30,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,215,0,0.2); border-radius: 1rem; }
-        .btn { transition: all 0.2s; }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
-        .error { color: #f87171; }
-        .success { color: #4ade80; }
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .btn {
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(255, 215, 0, 0.3);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .error {
+            color: #f87171;
+        }
+        .success {
+            color: #4ade80;
+        }
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #f59e0b;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Hide spinner on number inputs */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body class="p-4 md:p-6">
     <div class="max-w-4xl mx-auto space-y-6">
-        <!-- Header -->
+
+        <!-- Header with Title and Contract -->
         <div class="text-center">
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+            <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-amber-400 via-orange-500 to-amber-400 bg-clip-text text-transparent">
                 EfikCoin Eternal (ECE)
             </h1>
-            <p class="text-gray-400 mt-2">Decentralized financial ecosystem for humanity</p>
-            <p class="text-sm text-gray-500 break-all mt-1">
-                Contract: <span id="contractAddress" class="font-mono">0x9f8c29e496ecb6c39c221458f211234dfcb233e0</span>
+            <p class="text-gray-400 mt-2 text-lg">Decentralized financial ecosystem for humanity</p>
+            <p class="text-sm text-gray-500 break-all mt-2 font-mono bg-gray-800/50 p-2 rounded-xl inline-block">
+                Contract: 0x9f8c29e496ecb6c39c221458f211234dfcb233e0
             </p>
         </div>
 
-        <!-- Connection Status & Wallet Info -->
-        <div class="glass-card p-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-                <span id="connectionStatus" class="text-red-400 font-medium">🔴 Not connected</span>
-                <span id="networkStatus" class="ml-4 text-sm text-gray-400"></span>
+        <!-- Connection Panel -->
+        <div class="glass-card p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div id="connectionIndicator" class="w-3 h-3 rounded-full bg-red-500"></div>
+                <span id="connectionStatus" class="font-medium text-gray-300">Not connected</span>
+                <span id="networkStatus" class="text-sm text-gray-500"></span>
             </div>
             <div class="flex gap-3">
-                <button id="connectBtn" class="btn bg-amber-500 hover:bg-amber-600 text-black font-bold px-6 py-2 rounded-full">
-                    Connect Wallet
+                <button id="connectBtn" class="btn bg-amber-500 hover:bg-amber-600 text-black px-6 py-2.5 rounded-full text-sm font-bold shadow-lg">
+                    <i class="fas fa-wallet mr-2"></i>Connect Wallet
                 </button>
-                <button id="switchNetworkBtn" class="btn bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-full text-sm">
-                    Switch to BSC
+                <button id="switchNetworkBtn" class="btn bg-gray-700 hover:bg-gray-600 text-white px-5 py-2.5 rounded-full text-sm shadow-lg">
+                    <i class="fas fa-exchange-alt mr-2"></i>Switch to BSC
                 </button>
             </div>
         </div>
 
         <!-- Token Info Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="glass-card p-4">
-                <p class="text-gray-400 text-sm">Token Name</p>
-                <p id="tokenName" class="text-xl font-semibold">-</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="glass-card p-5 text-center">
+                <p class="text-gray-400 text-sm uppercase tracking-wider">Token Name</p>
+                <p id="tokenName" class="text-2xl font-bold text-amber-400 mt-1">-</p>
             </div>
-            <div class="glass-card p-4">
-                <p class="text-gray-400 text-sm">Symbol</p>
-                <p id="tokenSymbol" class="text-xl font-semibold">-</p>
+            <div class="glass-card p-5 text-center">
+                <p class="text-gray-400 text-sm uppercase tracking-wider">Symbol</p>
+                <p id="tokenSymbol" class="text-2xl font-bold text-amber-400 mt-1">-</p>
             </div>
-            <div class="glass-card p-4">
-                <p class="text-gray-400 text-sm">Total Supply</p>
-                <p id="totalSupply" class="text-xl font-semibold">-</p>
+            <div class="glass-card p-5 text-center">
+                <p class="text-gray-400 text-sm uppercase tracking-wider">Total Supply</p>
+                <p id="totalSupply" class="text-2xl font-bold text-amber-400 mt-1">-</p>
             </div>
         </div>
 
-        <!-- User Info & Balance -->
-        <div class="glass-card p-4">
-            <div class="flex flex-wrap justify-between items-center gap-3">
-                <div>
-                    <p class="text-gray-400 text-sm">Connected Address</p>
-                    <p id="userAddress" class="font-mono break-all">-</p>
+        <!-- User Info Card -->
+        <div class="glass-card p-5">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex-1">
+                    <p class="text-gray-400 text-sm mb-1"><i class="fas fa-user mr-1"></i>Connected Address</p>
+                    <p id="userAddress" class="font-mono text-sm break-all bg-black/30 p-2 rounded-lg">-</p>
                 </div>
-                <div class="text-right">
-                    <p class="text-gray-400 text-sm">Your ECE Balance</p>
-                    <p id="userBalance" class="text-2xl font-bold text-amber-400">0</p>
+                <div class="text-right md:text-center">
+                    <p class="text-gray-400 text-sm mb-1"><i class="fas fa-coins mr-1"></i>ECE Balance</p>
+                    <p id="userBalance" class="text-3xl font-bold text-amber-400">0</p>
                 </div>
-                <button id="refreshBalance" class="btn bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-full text-sm">
-                    🔄 Refresh
+                <button id="refreshBalance" class="btn bg-gray-700 hover:bg-gray-600 text-white px-5 py-2 rounded-full text-sm shadow-lg">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh
                 </button>
             </div>
         </div>
 
         <!-- Owner Dashboard (hidden by default) -->
-        <div id="ownerDashboard" class="glass-card p-4 hidden border-2 border-amber-500">
-            <h2 class="text-xl font-bold text-amber-400 mb-4">🔑 Owner Dashboard</h2>
-            <div class="space-y-4">
-                <!-- Mint Form -->
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Mint Tokens</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="mintAddress" placeholder="Recipient address" class="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white">
-                        <input type="number" id="mintAmount" placeholder="Amount (in ECE)" class="w-40 bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white">
-                        <button id="mintBtn" class="btn bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Mint</button>
+        <div id="ownerDashboard" class="glass-card p-5 border-2 border-amber-500/50 hidden">
+            <h2 class="text-2xl font-bold text-amber-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-crown"></i> Owner Dashboard
+            </h2>
+            <div class="space-y-5">
+                <!-- Mint Tokens -->
+                <div class="bg-black/30 p-4 rounded-xl">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Mint New Tokens</label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="mintAddress" placeholder="Recipient address (0x...)" class="flex-1 bg-gray-800 border border-gray-600 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
+                        <input type="number" id="mintAmount" placeholder="Amount (in ECE)" class="w-full sm:w-40 bg-gray-800 border border-gray-600 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
+                        <button id="mintBtn" class="btn bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg">
+                            <i class="fas fa-hammer mr-2"></i>Mint
+                        </button>
                     </div>
                 </div>
 
-                <!-- Airdrop Form -->
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Airdrop (one address per line: address,amount)</label>
-                    <textarea id="airdropList" rows="3" placeholder="0x123...,100&#10;0x456...,200" class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white"></textarea>
-                    <button id="airdropBtn" class="btn bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded mt-2">Execute Airdrop</button>
+                <!-- Airdrop -->
+                <div class="bg-black/30 p-4 rounded-xl">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Airdrop (one address,amount per line)</label>
+                    <textarea id="airdropList" rows="3" placeholder="0x123...,100&#10;0x456...,200" class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"></textarea>
+                    <button id="airdropBtn" class="btn bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl mt-3 font-semibold shadow-lg">
+                        <i class="fas fa-cloud-upload-alt mr-2"></i>Execute Airdrop
+                    </button>
                 </div>
 
                 <!-- Set Pair Address -->
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Set PancakeSwap Pair Address</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="pairAddress" placeholder="0x..." class="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white">
-                        <button id="setPairBtn" class="btn bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Set</button>
+                <div class="bg-black/30 p-4 rounded-xl">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Set PancakeSwap Pair Address</label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="pairAddress" placeholder="0x..." class="flex-1 bg-gray-800 border border-gray-600 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
+                        <button id="setPairBtn" class="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg">
+                            <i class="fas fa-link mr-2"></i>Set Pair
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Transfer Section -->
-        <div class="glass-card p-4">
-            <h2 class="text-xl font-bold mb-4">💸 Transfer ECE</h2>
-            <div class="flex flex-wrap gap-2 items-end">
+        <div class="glass-card p-5">
+            <h2 class="text-2xl font-bold text-gray-200 mb-4 flex items-center gap-2">
+                <i class="fas fa-paper-plane text-amber-400"></i> Transfer ECE
+            </h2>
+            <div class="flex flex-col md:flex-row gap-4 items-end">
                 <div class="flex-1">
                     <label class="block text-sm text-gray-400 mb-1">Recipient Address</label>
-                    <input type="text" id="transferTo" placeholder="0x..." class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white">
+                    <input type="text" id="transferTo" placeholder="0x..." class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
                 </div>
-                <div class="w-40">
+                <div class="w-full md:w-48">
                     <label class="block text-sm text-gray-400 mb-1">Amount (ECE)</label>
-                    <input type="number" id="transferAmount" placeholder="0.0" class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white">
+                    <input type="number" id="transferAmount" placeholder="0.0" class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500">
                 </div>
-                <button id="transferBtn" class="btn bg-amber-500 hover:bg-amber-600 text-black font-semibold px-6 py-2 rounded">
-                    Transfer
+                <button id="transferBtn" class="btn bg-amber-500 hover:bg-amber-600 text-black font-bold px-8 py-3 rounded-xl shadow-lg w-full md:w-auto">
+                    <i class="fas fa-arrow-right mr-2"></i>Transfer
                 </button>
             </div>
         </div>
 
         <!-- Transaction Status & Logs -->
-        <div class="glass-card p-4">
-            <div id="txStatus" class="text-sm"></div>
-            <div id="txError" class="text-sm error"></div>
-            <div id="txSuccess" class="text-sm success"></div>
+        <div class="glass-card p-5">
+            <div id="txStatus" class="text-sm text-gray-400 flex items-center gap-2"></div>
+            <div id="txError" class="text-sm error mt-2"></div>
+            <div id="txSuccess" class="text-sm success mt-2"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-gray-600 text-xs mt-6">
+            <p>Built for humanity. Live on BSC Mainnet.</p>
         </div>
     </div>
 
     <script>
-        // ==================== CONFIGURATION ====================
+        // ==================== CONFIG ====================
         const CONTRACT_ADDRESS = "0x9f8c29e496ecb6c39c221458f211234dfcb233e0";
-        // Full ABI of SimpleEfik contract (self-contained, with mint, airdrop, setPairAddress, owner, etc.)
         const CONTRACT_ABI = [
             "constructor(string _name, string _symbol, uint256 _initialSupply)",
             "function name() view returns (string)",
@@ -164,13 +226,15 @@
             "event PairAddressSet(address indexed pair)"
         ];
 
-        // ==================== GLOBAL VARIABLES ====================
+        // ==================== STATE ====================
         let provider, signer, contract, userAddress;
         let isOwner = false;
+        let decimals = 18; // default, will be fetched
 
-        // ==================== DOM ELEMENTS ====================
+        // ==================== DOM ====================
         const connectBtn = document.getElementById('connectBtn');
         const switchNetworkBtn = document.getElementById('switchNetworkBtn');
+        const connectionIndicator = document.getElementById('connectionIndicator');
         const connectionStatus = document.getElementById('connectionStatus');
         const networkStatus = document.getElementById('networkStatus');
         const tokenNameEl = document.getElementById('tokenName');
@@ -194,17 +258,25 @@
         const txError = document.getElementById('txError');
         const txSuccess = document.getElementById('txSuccess');
 
-        // ==================== HELPER FUNCTIONS ====================
-        function setStatus(msg) { txStatus.innerText = msg; }
+        // ==================== UTILS ====================
+        function setStatus(msg) { txStatus.innerHTML = msg; }
         function setError(msg) { txError.innerText = msg; txSuccess.innerText = ''; }
         function setSuccess(msg) { txSuccess.innerText = msg; txError.innerText = ''; }
-        function clearMessages() { txStatus.innerText = ''; txError.innerText = ''; txSuccess.innerText = ''; }
+        function clearMessages() { txStatus.innerHTML = ''; txError.innerText = ''; txSuccess.innerText = ''; }
+
+        async function ensureDecimals() {
+            if (!contract) return 18;
+            try {
+                decimals = await contract.decimals();
+            } catch (e) { /* ignore */ }
+            return decimals;
+        }
 
         async function switchToBSC() {
             try {
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x38' }] // BSC mainnet
+                    params: [{ chainId: '0x38' }]
                 });
                 networkStatus.innerText = '✅ BSC Mainnet';
             } catch (switchError) {
@@ -220,6 +292,7 @@
                                 blockExplorerUrls: ['https://bscscan.com/']
                             }]
                         });
+                        networkStatus.innerText = '✅ BSC Mainnet';
                     } catch (addError) {
                         setError('Failed to add BSC network: ' + addError.message);
                     }
@@ -234,11 +307,10 @@
             try {
                 const name = await contract.name();
                 const symbol = await contract.symbol();
-                const decimals = await contract.decimals();
                 const total = await contract.totalSupply();
                 tokenNameEl.innerText = name;
                 tokenSymbolEl.innerText = symbol;
-                totalSupplyEl.innerText = ethers.formatUnits(total, decimals) + ' ' + symbol;
+                totalSupplyEl.innerText = ethers.formatUnits(total, await ensureDecimals()) + ' ' + symbol;
             } catch (e) {
                 setError('Error loading token info: ' + e.message);
             }
@@ -247,9 +319,8 @@
         async function loadUserBalance() {
             if (!contract || !userAddress) return;
             try {
-                const decimals = await contract.decimals();
                 const bal = await contract.balanceOf(userAddress);
-                userBalanceEl.innerText = ethers.formatUnits(bal, decimals) + ' ECE';
+                userBalanceEl.innerText = ethers.formatUnits(bal, await ensureDecimals()) + ' ECE';
             } catch (e) {
                 setError('Error loading balance: ' + e.message);
             }
@@ -266,33 +337,35 @@
                     ownerDashboard.classList.add('hidden');
                 }
             } catch (e) {
-                // contract might not have owner function? but it does.
                 console.warn('Owner check failed', e);
             }
         }
 
         async function connectWallet() {
             if (!window.ethereum) {
-                setError('MetaMask not detected. Please install MetaMask.');
+                setError('⚠️ MetaMask not detected. Please install MetaMask.');
                 return;
             }
             try {
-                setStatus('Connecting...');
+                setStatus('<span class="loading"></span> Connecting...');
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 provider = new ethers.BrowserProvider(window.ethereum);
                 signer = await provider.getSigner();
                 userAddress = await signer.getAddress();
                 userAddressEl.innerText = userAddress;
-                connectionStatus.innerText = '🟢 Connected';
-                connectionStatus.classList.remove('text-red-400');
-                connectionStatus.classList.add('text-green-400');
+
+                // Update UI
+                connectionIndicator.className = 'w-3 h-3 rounded-full bg-green-500';
+                connectionStatus.innerText = 'Connected';
+                networkStatus.innerText = '';
 
                 // Check network
                 const network = await provider.getNetwork();
                 if (network.chainId === 56n) {
                     networkStatus.innerText = '✅ BSC Mainnet';
                 } else {
-                    networkStatus.innerText = '❌ Wrong network (switch to BSC)';
+                    networkStatus.innerText = '❌ Wrong network';
+                    await switchToBSC(); // attempt switch
                 }
 
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
@@ -320,6 +393,8 @@
                 setSuccess('Wallet connected successfully!');
             } catch (e) {
                 setError('Connection failed: ' + e.message);
+            } finally {
+                setStatus('');
             }
         }
 
@@ -328,31 +403,33 @@
             contract = null;
             userAddressEl.innerText = '-';
             userBalanceEl.innerText = '0';
-            connectionStatus.innerText = '🔴 Not connected';
-            connectionStatus.classList.remove('text-green-400');
-            connectionStatus.classList.add('text-red-400');
+            connectionIndicator.className = 'w-3 h-3 rounded-full bg-red-500';
+            connectionStatus.innerText = 'Not connected';
             networkStatus.innerText = '';
             ownerDashboard.classList.add('hidden');
             setSuccess('');
         }
 
-        // ==================== TRANSACTION FUNCTIONS ====================
+        // ==================== TRANSACTIONS ====================
         async function transfer() {
             const to = transferTo.value.trim();
             const amountStr = transferAmount.value.trim();
             if (!to || !amountStr) return setError('Please fill recipient and amount');
             try {
                 clearMessages();
-                setStatus('Processing transfer...');
-                const decimals = await contract.decimals();
-                const amount = ethers.parseUnits(amountStr, decimals);
+                setStatus('<span class="loading"></span> Processing transfer...');
+                const amount = ethers.parseUnits(amountStr, await ensureDecimals());
                 const tx = await contract.transfer(to, amount);
-                setStatus(`Transaction sent: ${tx.hash}`);
+                setStatus(`⏳ Transaction sent: <a href="https://bscscan.com/tx/${tx.hash}" target="_blank" class="text-amber-400 underline">${tx.hash.slice(0,10)}...</a>`);
                 await tx.wait();
-                setSuccess('Transfer completed!');
+                setSuccess('✅ Transfer completed!');
                 loadUserBalance();
+                transferTo.value = '';
+                transferAmount.value = '';
             } catch (e) {
-                setError('Transfer failed: ' + e.message);
+                setError('❌ Transfer failed: ' + e.message);
+            } finally {
+                setStatus('');
             }
         }
 
@@ -362,17 +439,20 @@
             if (!to || !amountStr) return setError('Fill recipient and amount');
             try {
                 clearMessages();
-                setStatus('Minting...');
-                const decimals = await contract.decimals();
-                const amount = ethers.parseUnits(amountStr, decimals);
+                setStatus('<span class="loading"></span> Minting...');
+                const amount = ethers.parseUnits(amountStr, await ensureDecimals());
                 const tx = await contract.mint(to, amount);
-                setStatus(`Mint tx: ${tx.hash}`);
+                setStatus(`⏳ Mint tx: <a href="https://bscscan.com/tx/${tx.hash}" target="_blank" class="text-amber-400 underline">${tx.hash.slice(0,10)}...</a>`);
                 await tx.wait();
-                setSuccess('Minted successfully!');
+                setSuccess('✅ Minted successfully!');
                 loadUserBalance();
-                loadTokenInfo(); // total supply increased
+                loadTokenInfo(); // total supply changed
+                mintAddress.value = '';
+                mintAmount.value = '';
             } catch (e) {
-                setError('Mint failed: ' + e.message);
+                setError('❌ Mint failed: ' + e.message);
+            } finally {
+                setStatus('');
             }
         }
 
@@ -382,7 +462,7 @@
             const lines = text.split('\n');
             const recipients = [];
             const amounts = [];
-            const decimals = await contract.decimals();
+            const dec = await ensureDecimals();
             for (let line of lines) {
                 line = line.trim();
                 if (line === '') continue;
@@ -391,20 +471,23 @@
                 const addr = parts[0].trim();
                 const amtStr = parts[1].trim();
                 if (!ethers.isAddress(addr)) return setError(`Invalid address: ${addr}`);
-                const amt = ethers.parseUnits(amtStr, decimals);
+                const amt = ethers.parseUnits(amtStr, dec);
                 recipients.push(addr);
                 amounts.push(amt);
             }
             try {
                 clearMessages();
-                setStatus(`Airdropping to ${recipients.length} addresses...`);
+                setStatus(`<span class="loading"></span> Airdropping to ${recipients.length} addresses...`);
                 const tx = await contract.airdrop(recipients, amounts);
-                setStatus(`Airdrop tx: ${tx.hash}`);
+                setStatus(`⏳ Airdrop tx: <a href="https://bscscan.com/tx/${tx.hash}" target="_blank" class="text-amber-400 underline">${tx.hash.slice(0,10)}...</a>`);
                 await tx.wait();
-                setSuccess('Airdrop completed!');
-                loadUserBalance();
+                setSuccess('✅ Airdrop completed!');
+                loadUserBalance(); // owner balance decreased
+                airdropList.value = '';
             } catch (e) {
-                setError('Airdrop failed: ' + e.message);
+                setError('❌ Airdrop failed: ' + e.message);
+            } finally {
+                setStatus('');
             }
         }
 
@@ -414,13 +497,16 @@
             if (!ethers.isAddress(pair)) return setError('Invalid address');
             try {
                 clearMessages();
-                setStatus('Setting pair address...');
+                setStatus('<span class="loading"></span> Setting pair address...');
                 const tx = await contract.setPairAddress(pair);
-                setStatus(`Set pair tx: ${tx.hash}`);
+                setStatus(`⏳ Set pair tx: <a href="https://bscscan.com/tx/${tx.hash}" target="_blank" class="text-amber-400 underline">${tx.hash.slice(0,10)}...</a>`);
                 await tx.wait();
-                setSuccess('Pair address updated!');
+                setSuccess('✅ Pair address updated!');
+                pairAddressInput.value = '';
             } catch (e) {
-                setError('Set pair failed: ' + e.message);
+                setError('❌ Set pair failed: ' + e.message);
+            } finally {
+                setStatus('');
             }
         }
 
@@ -433,7 +519,7 @@
         airdropBtn.addEventListener('click', airdrop);
         setPairBtn.addEventListener('click', setPair);
 
-        // Auto-connect if previously connected (optional)
+        // Auto-connect if previously connected
         window.addEventListener('load', () => {
             if (window.ethereum && window.ethereum.selectedAddress) {
                 connectWallet();
@@ -441,4 +527,4 @@
         });
     </script>
 </body>
-                                                                 </html>
+                </html>
