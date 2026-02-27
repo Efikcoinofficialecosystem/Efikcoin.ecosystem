@@ -535,3 +535,9 @@ Tally.loadEmbeds();
     </script>
 </body>
                 </html>
+// Add this to your website to fetch token info
+async function loadTokenMetadata() {
+  const response = await fetch('https://raw.githubusercontent.com/Efikcoinofficialecosystem/efikcoin-eternal/main/ece-tokenlist.json');
+  const metadata = await response.json();
+  // Use metadata to populate your site
+}
