@@ -1,16 +1,88 @@
-<!-- Connection Panel -->
-<div class="glass-card p-5 flex flex-col md:flex-row justify-between items-center gap-4">
-    <div class="flex items-center gap-3">
-        <div id="connectionIndicator" class="w-3 h-3 rounded-full bg-red-500"></div>
-        <span id="connectionStatus" class="font-medium text-gray-300">Not connected</span>
-        <span id="networkStatus" class="text-sm text-gray-500"></span>
-    </div>
-    <div class="flex gap-3">
-        <button id="connectBtn" class="btn bg-amber-500 hover:bg-amber-600 text-black px-6 py-2.5 rounded-full text-sm font-bold shadow-lg">
-            <i class="fas fa-wallet mr-2"></i>Connect Wallet
-        </button>
-        <button id="switchNetworkBtn" class="btn bg-gray-700 hover:bg-gray-600 text-white px-5 py-2.5 rounded-full text-sm shadow-lg">
-            <i class="fas fa-exchange-alt mr-2"></i>Switch to BSC
-        </button>
-    </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EfikCoin Eternal – Simple Connect</title>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: sans-serif; padding: 2rem; text-align: center; }
+        button { background: #f59e0b; color: black; padding: 1rem 2rem; border: none; border-radius: 2rem; font-size: 1.2rem; cursor: pointer; }
+        button:hover { background: #d97706; }
+        #status { margin-top: 2rem; color: #ccc; }
+        #balance { font-size: 2rem; color: #f59e0b; }
+        .error { color: #f87171; }
+    </style>
+</head>
+<body>
+    <h1>EfikCoin Eternal (ECE)</h1>
+    <p>Contract: 0x9f8c29e496ecb6c39c221458f211234dfcb233e0</p>
+    <button id="connect">Connect Wallet</button>
+    <div id="status"></div>
+    <div id="balance"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script>
+        const CONTRACT = "0x9f8c29e496ecb6c39c221458f211234dfcb233e0";
+        const ABI = [
+            "function balanceOf(address) view returns (uint256)",
+            "function decimals() view returns (uint8)",
+            "function symbol() view returns (string)"
+        ];
+
+        document.getElementById('connect').addEventListener('click', async () => {
+            const statusDiv = document.getElementById('status');
+            const balanceDiv = document.getElementById('balance');
+            statusDiv.innerText = '';
+            balanceDiv.innerText = '';
+
+            if (!window.ethereum) {
+                statusDiv.innerHTML = '<span class="error">❌ MetaMask not installed. Please install from <a href="https://metamask.io" target="_blank">metamask.io</a></span>';
+                return;
+            }
+
+            try {
+                statusDiv.innerText = '⏳ Requesting accounts...';
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                statusDiv.innerText = '⏳ Switching to BSC...';
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }]
+                    });
+                } catch (e) {
+                    if (e.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x38',
+                                chainName: 'BNB Smart Chain',
+                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                rpcUrls: ['https://bsc-dataseed.binance.org/']
+                            }]
+                        });
+                    } else {
+                        throw e;
+                    }
+                }
+
+                statusDiv.innerText = '⏳ Connecting to contract...';
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const address = await signer.getAddress();
+
+                const contract = new ethers.Contract(CONTRACT, ABI, provider);
+                const balance = await contract.balanceOf(address);
+                const decimals = await contract.decimals();
+                const symbol = await contract.symbol();
+
+                const formatted = ethers.formatUnits(balance, decimals);
+                statusDiv.innerHTML = '✅ Connected!';
+                balanceDiv.innerHTML = `Your balance: ${formatted} ${symbol}`;
+            } catch (err) {
+                statusDiv.innerHTML = `<span class="error">❌ Error: ${err.message}</span>`;
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
