@@ -3,101 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Efikcoin Eternal | Official Ecosystem</title>
+    <title>Efikcoin Eternal | Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        body { background-color: #0f172a; color: white; font-family: sans-serif; }
         .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
 
-    <!-- Navigation -->
     <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
-        <h1 class="text-2xl font-bold gradient-text">EFIKCOIN ETERNAL</h1>
-        <button id="connectButton" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold transition">
+        <h1 class="text-xl font-bold gradient-text">EFIKCOIN ETERNAL</h1>
+        <button id="connectButton" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-bold transition">
             Connect Wallet
         </button>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="py-20 text-center px-4">
-        <h2 class="text-5xl md:text-7xl font-extrabold mb-6">The Future of the <span class="gradient-text">Efik Ecosystem</span></h2>
-        <p class="text-gray-400 text-xl max-w-2xl mx-auto mb-10">Empowering the community through decentralized finance. Secure, fast, and built on the BNB Smart Chain.</p>
-        <div class="flex flex-wrap justify-center gap-4">
-            <a href="#about" class="bg-white text-black px-8 py-3 rounded-full font-bold">Learn More</a>
-            <button onclick="copyContract()" class="bg-gray-800 border border-gray-600 px-8 py-3 rounded-full font-bold hover:bg-gray-700">
-                Copy Contract Address
-            </button>
+    <header class="py-16 text-center px-4">
+        <h2 class="text-4xl font-extrabold mb-4">Official <span class="gradient-text">Efikcoin</span> Portal</h2>
+        
+        <!-- Wallet Info Box -->
+        <div id="walletInfo" class="hidden max-w-md mx-auto mt-8 card p-6 rounded-2xl border-blue-500 border">
+            <p class="text-gray-400 text-sm">Wallet Connected:</p>
+            <p id="userAddress" class="font-mono text-xs text-blue-300 mb-4 truncate"></p>
+            
+            <div class="bg-slate-800 p-4 rounded-xl">
+                <p class="text-xs uppercase text-gray-400">Your EFIK Balance</p>
+                <p id="tokenBalance" class="text-3xl font-bold text-white">0.00</p>
+                <p class="text-blue-400 font-bold">EFIK</p>
+            </div>
+        </div>
+
+        <div id="installMessage" class="mt-4 text-orange-400 text-sm hidden">
+            Using mobile? Open this site inside the <b>MetaMask App Browser</b>.
         </div>
     </header>
 
-    <!-- Stats/Contract Section -->
-    <section class="max-w-5xl mx-auto px-4 py-10">
-        <div class="card p-8 rounded-3xl text-center">
-            <h3 class="text-sm uppercase tracking-widest text-blue-400 mb-2">Verified Contract Address (BSC)</h3>
-            <p id="contractAddr" class="text-lg md:text-2xl font-mono break-all text-gray-200">0x9F8C29E496ECB6C39c221458f211234DfCB233E0</p>
+    <section class="max-w-4xl mx-auto px-4 pb-20">
+        <div class="card p-6 rounded-2xl mb-6">
+            <h3 class="text-sm text-blue-400 font-bold mb-2">CONTRACT ADDRESS (BSC)</h3>
+            <p class="text-xs md:text-base font-mono break-all">0x9F8C29E496ECB6C39c221458f211234DfCB233E0</p>
         </div>
     </section>
-
-    <!-- Tokenomics -->
-    <section id="about" class="max-w-7xl mx-auto px-4 py-20 grid md:grid-cols-3 gap-8">
-        <div class="card p-8 rounded-2xl">
-            <i class="fas fa-coins text-4xl text-blue-500 mb-4"></i>
-            <h4 class="text-xl font-bold mb-2">Token Name</h4>
-            <p class="text-gray-400">Efikcoin Eternal</p>
-        </div>
-        <div class="card p-8 rounded-2xl">
-            <i class="fas fa-network-wired text-4xl text-purple-500 mb-4"></i>
-            <h4 class="text-xl font-bold mb-2">Network</h4>
-            <p class="text-gray-400">BNB Smart Chain (BEP-20)</p>
-        </div>
-        <div class="card p-8 rounded-2xl">
-            <i class="fas fa-chart-pie text-4xl text-green-500 mb-4"></i>
-            <h4 class="text-xl font-bold mb-2">Symbol / Decimals</h4>
-            <p class="text-gray-400">Symbol: EFIK | Decimals: 18</p>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-10 border-t border-gray-800 text-center">
-        <p class="text-gray-500">&copy; 2024 Efikcoin Official Ecosystem. Port Harcourt, Nigeria.</p>
-    </footer>
 
     <script>
-        // Contract Copy Function
-        function copyContract() {
-            const el = document.createElement('textarea');
-            el.value = "0x9F8C29E496ECB6C39c221458f211234DfCB233E0";
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            alert("Contract Address Copied!");
-        }
+        const contractAddress = "0x9F8C29E496ECB6C39c221458f211234DfCB233E0";
+        const tokenAbi = [
+            "function balanceOf(address owner) view returns (uint256)",
+            "function decimals() view returns (uint8)",
+            "function symbol() view returns (string)"
+        ];
 
-        // Wallet Connection Logic
-        const connectButton = document.getElementById('connectButton');
+        const btn = document.getElementById('connectButton');
+        const walletInfo = document.getElementById('walletInfo');
+        const userAddress = document.getElementById('userAddress');
+        const tokenBalance = document.getElementById('tokenBalance');
+        const installMsg = document.getElementById('installMessage');
 
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
-                    connectButton.innerText = account.substring(0, 6) + "..." + account.substring(38);
-                    connectButton.classList.replace('bg-blue-600', 'bg-green-600');
-                } catch (error) {
-                    console.error("User denied account access", error);
-                }
-            } else {
-                alert("Please install MetaMask or Trust Wallet to connect!");
+        async function updateBalance(account, provider) {
+            try {
+                const contract = new ethers.Contract(contractAddress, tokenAbi, provider);
+                const balance = await contract.balanceOf(account);
+                const decimals = await contract.decimals();
+                const formattedBalance = ethers.utils.formatUnits(balance, decimals);
+                
+                tokenBalance.innerText = parseFloat(formattedBalance).toLocaleString(undefined, {minimumFractionDigits: 2});
+            } catch (err) {
+                console.error("Error fetching balance:", err);
             }
         }
 
-        connectButton.addEventListener('click', connectWallet);
+        async function connect() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Request accounts
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0];
+                    
+                    // Set up Provider
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    
+                    // UI Changes
+                    btn.innerText = "Connected";
+                    btn.classList.replace('bg-blue-600', 'bg-green-600');
+                    walletInfo.classList.remove('hidden');
+                    userAddress.innerText = account;
+                    installMsg.classList.add('hidden');
+
+                    // Get Balance
+                    updateBalance(account, provider);
+
+                } catch (error) {
+                    console.error("Connection failed", error);
+                }
+            } else {
+                // Show help message for mobile users
+                installMsg.classList.remove('hidden');
+                alert("Please open this website inside your MetaMask or Trust Wallet App browser.");
+            }
+        }
+
+        btn.addEventListener('click', connect);
     </script>
 </body>
 </html>
