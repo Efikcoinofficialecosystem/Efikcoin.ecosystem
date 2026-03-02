@@ -3,109 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Efikcoin Eternal | Ecosystem</title>
+    <title>EFIK Terminal | Efikcoin Eternal Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0f172a; color: white; font-family: sans-serif; }
-        .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
+        body { background-color: #020617; color: #f8fafc; font-family: 'Space Grotesk', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.2); backdrop-filter: blur(12px); }
+        .neon-text { text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); transition: all 0.3s; }
+        .btn-primary:hover { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
     </style>
 </head>
-<body>
+<body class="min-h-screen">
 
-    <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
-        <h1 class="text-xl font-bold gradient-text">EFIKCOIN ETERNAL</h1>
-        <button id="connectButton" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-bold transition">
-            Connect Wallet
+    <!-- Header -->
+    <nav class="max-w-7xl mx-auto p-6 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold text-xl">E</div>
+            <h1 class="text-xl font-bold tracking-tighter neon-text">EFIK TERMINAL</h1>
+        </div>
+        <button id="connectBtn" class="btn-primary px-6 py-2 rounded-xl font-bold text-sm">
+            CONNECT WALLET
         </button>
     </nav>
 
-    <header class="py-16 text-center px-4">
-        <h2 class="text-4xl font-extrabold mb-4">Official <span class="gradient-text">Efikcoin</span> Portal</h2>
-        
-        <!-- Wallet Info Box -->
-        <div id="walletInfo" class="hidden max-w-md mx-auto mt-8 card p-6 rounded-2xl border-blue-500 border">
-            <p class="text-gray-400 text-sm">Wallet Connected:</p>
-            <p id="userAddress" class="font-mono text-xs text-blue-300 mb-4 truncate"></p>
-            
-            <div class="bg-slate-800 p-4 rounded-xl">
-                <p class="text-xs uppercase text-gray-400">Your EFIK Balance</p>
-                <p id="tokenBalance" class="text-3xl font-bold text-white">0.00</p>
-                <p class="text-blue-400 font-bold">EFIK</p>
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <!-- Hero Stats -->
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="glass p-6 rounded-3xl">
+                <p class="text-blue-400 text-xs font-bold uppercase mb-2">Total Supply</p>
+                <h3 id="totalSupply" class="text-2xl font-bold">Loading...</h3>
+                <p class="text-gray-500 text-xs mt-1">EFIK Tokens</p>
+            </div>
+            <div class="glass p-6 rounded-3xl border-l-4 border-l-blue-500">
+                <p class="text-blue-400 text-xs font-bold uppercase mb-2">Your Balance</p>
+                <h3 id="userBalance" class="text-2xl font-bold">0.00</h3>
+                <p id="walletAddressDisplay" class="text-gray-500 text-xs mt-1 truncate tracking-widest">Connect Wallet</p>
+            </div>
+            <div class="glass p-6 rounded-3xl">
+                <p class="text-purple-400 text-xs font-bold uppercase mb-2">Network Status</p>
+                <h3 class="text-2xl font-bold text-green-400">Online</h3>
+                <p class="text-gray-500 text-xs mt-1">BNB Smart Chain</p>
             </div>
         </div>
 
-        <div id="installMessage" class="mt-4 text-orange-400 text-sm hidden">
-            Using mobile? Open this site inside the <b>MetaMask App Browser</b>.
-        </div>
-    </header>
+        <!-- Action Tools -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Left: Chart & Links -->
+            <div class="space-y-6">
+                <h2 class="text-3xl font-bold">Ecosystem <span class="text-blue-500">Tools</span></h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="https://pancakeswap.finance/swap?outputCurrency=0x9F8C29E496ECB6C39c221458f211234DfCB233E0" target="_blank" class="glass p-4 rounded-2xl hover:bg-slate-800 transition flex items-center gap-3">
+                        <i class="fas fa-exchange-alt text-orange-400"></i>
+                        <span>Trade on PancakeSwap</span>
+                    </a>
+                    <a href="https://bscscan.com/token/0x9F8C29E496ECB6C39c221458f211234DfCB233E0" target="_blank" class="glass p-4 rounded-2xl hover:bg-slate-800 transition flex items-center gap-3">
+                        <i class="fas fa-search text-blue-400"></i>
+                        <span>View Contract</span>
+                    </a>
+                    <a href="https://dexscreener.com/bsc/0x7FAbe1cc407f0e01c3cdF5Cc05744f8D98bC70B6" target="_blank" class="glass p-4 rounded-2xl hover:bg-slate-800 transition flex items-center gap-3 text-sm">
+                        <i class="fas fa-chart-line text-green-400"></i>
+                        <span>Live Chart (DexScreener)</span>
+                    </a>
+                    <button onclick="copyPair()" class="glass p-4 rounded-2xl hover:bg-slate-800 transition flex items-center gap-3 text-sm">
+                        <i class="fas fa-tint text-cyan-400"></i>
+                        <span>Copy Pool Pair Address</span>
+                    </button>
+                </div>
+            </div>
 
-    <section class="max-w-4xl mx-auto px-4 pb-20">
-        <div class="card p-6 rounded-2xl mb-6">
-            <h3 class="text-sm text-blue-400 font-bold mb-2">CONTRACT ADDRESS (BSC)</h3>
-            <p class="text-xs md:text-base font-mono break-all">0x9F8C29E496ECB6C39c221458f211234DfCB233E0</p>
+            <!-- Right: Live Token Info -->
+            <div class="glass p-8 rounded-[2rem] relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i class="fas fa-shield-alt text-9xl"></i>
+                </div>
+                <h4 class="text-xl font-bold mb-6">Security & Identity</h4>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase mb-1">Token Contract</p>
+                        <p class="font-mono text-sm break-all text-blue-300">0x9F8C29E496ECB6C39c221458f211234DfCB233E0</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase mb-1">Liquidity Pair Address</p>
+                        <p class="font-mono text-sm break-all text-purple-300">0x7FAbe1cc407f0e01c3cdF5Cc05744f8D98bC70B6</p>
+                    </div>
+                    <div class="pt-4 border-t border-gray-800 flex justify-between">
+                        <span class="text-sm">Verified Contract</span>
+                        <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </main>
 
     <script>
-        const contractAddress = "0x9F8C29E496ECB6C39c221458f211234DfCB233E0";
-        const tokenAbi = [
-            "function balanceOf(address owner) view returns (uint256)",
-            "function decimals() view returns (uint8)",
-            "function symbol() view returns (string)"
+        const tokenAddress = "0x9F8C29E496ECB6C39c221458f211234DfCB233E0";
+        const pairAddress = "0x7FAbe1cc407f0e01c3cdF5Cc05744f8D98bC70B6";
+        
+        const simpleAbi = [
+            "function name() view returns (string)",
+            "function symbol() view returns (string)",
+            "function balanceOf(address) view returns (uint256)",
+            "function totalSupply() view returns (uint256)",
+            "function decimals() view returns (uint8)"
         ];
 
-        const btn = document.getElementById('connectButton');
-        const walletInfo = document.getElementById('walletInfo');
-        const userAddress = document.getElementById('userAddress');
-        const tokenBalance = document.getElementById('tokenBalance');
-        const installMsg = document.getElementById('installMessage');
+        let provider, signer, contract;
 
-        async function updateBalance(account, provider) {
+        async function init() {
+            // Load Public Data (Even if wallet not connected)
+            const bscRpc = "https://bsc-dataseed.binance.org/";
+            const publicProvider = new ethers.providers.JsonRpcProvider(bscRpc);
+            const publicContract = new ethers.Contract(tokenAddress, simpleAbi, publicProvider);
+            
             try {
-                const contract = new ethers.Contract(contractAddress, tokenAbi, provider);
-                const balance = await contract.balanceOf(account);
-                const decimals = await contract.decimals();
-                const formattedBalance = ethers.utils.formatUnits(balance, decimals);
-                
-                tokenBalance.innerText = parseFloat(formattedBalance).toLocaleString(undefined, {minimumFractionDigits: 2});
-            } catch (err) {
-                console.error("Error fetching balance:", err);
-            }
+                const supply = await publicContract.totalSupply();
+                const decimals = await publicContract.decimals();
+                document.getElementById('totalSupply').innerText = 
+                    parseFloat(ethers.utils.formatUnits(supply, decimals)).toLocaleString();
+            } catch (e) { console.error("Data fetch error", e); }
         }
 
         async function connect() {
-            if (typeof window.ethereum !== 'undefined') {
+            if (window.ethereum) {
                 try {
-                    // Request accounts
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
-                    
-                    // Set up Provider
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    
-                    // UI Changes
-                    btn.innerText = "Connected";
-                    btn.classList.replace('bg-blue-600', 'bg-green-600');
-                    walletInfo.classList.remove('hidden');
-                    userAddress.innerText = account;
-                    installMsg.classList.add('hidden');
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    contract = new ethers.Contract(tokenAddress, simpleAbi, signer);
 
-                    // Get Balance
-                    updateBalance(account, provider);
+                    // Update UI
+                    document.getElementById('connectBtn').innerText = "Connected";
+                    document.getElementById('walletAddressDisplay').innerText = address;
+                    
+                    // Get User Balance
+                    const balance = await contract.balanceOf(address);
+                    const decimals = await contract.decimals();
+                    document.getElementById('userBalance').innerText = 
+                        parseFloat(ethers.utils.formatUnits(balance, decimals)).toLocaleString();
 
-                } catch (error) {
-                    console.error("Connection failed", error);
+                } catch (err) {
+                    console.error(err);
+                    alert("Connection failed!");
                 }
             } else {
-                // Show help message for mobile users
-                installMsg.classList.remove('hidden');
-                alert("Please open this website inside your MetaMask or Trust Wallet App browser.");
+                alert("Please open this page in the MetaMask App Browser.");
             }
         }
 
-        btn.addEventListener('click', connect);
+        function copyPair() {
+            navigator.clipboard.writeText(pairAddress);
+            alert("Pair Address Copied!");
+        }
+
+        document.getElementById('connectBtn').addEventListener('click', connect);
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
